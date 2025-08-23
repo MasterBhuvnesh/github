@@ -1,0 +1,105 @@
+---
+title: Repository
+description: Understanding repositories and pushing code to GitHub
+---
+
+---
+
+# What is a Repository?
+
+A **repository** (or **repo**) is a storage location for your project’s code and related files. It ensures that your code runs without errors by keeping everything organized.
+
+- **Local Repository** → A directory on your own machine.
+- **Remote Repository** → A repository hosted on platforms like **GitHub**, GitLab, or Bitbucket.
+
+---
+
+# Pushing Code to GitHub for the First Time
+
+Here’s a **step-by-step beginner-friendly guide** on how to push your code to GitHub for the very first time using Git.
+
+---
+
+## 🔹 Prerequisites
+
+- [Git installed](https://git-scm.com/downloads) on your system.
+- A [GitHub account](https://github.com/).
+- A new or existing repository on GitHub.
+
+---
+
+## 🔹 Steps to Push Code to GitHub
+
+### 1. Initialize Git in Your Project
+
+Open a terminal inside your project folder and run:
+
+```bash
+git init
+```
+
+- This creates a new Git repository in your project.
+
+---
+
+### 2. Connect Your Local Repository to GitHub
+
+Copy the **repository URL** from GitHub (choose HTTPS if you’re a beginner).
+Example:
+
+```
+https://github.com/username/repo-name.git
+```
+
+Then run:
+
+```bash
+git remote add origin https://github.com/username/repo-name.git
+```
+
+---
+
+### 3. Add Files to Staging Area
+
+To add all files in the project:
+
+```bash
+git add .
+```
+
+---
+
+### 4. Commit Your Changes
+
+```bash
+git commit -m "Initial commit"
+```
+
+💡 The message (`"Initial commit"`) describes what this commit does.
+
+---
+
+### 5. Push to GitHub
+
+If your repository is **new and empty**, use:
+
+```bash
+git branch -M main
+git push -u origin main
+```
+
+From now on, you can simply push updates with:
+
+```bash
+git push
+```
+
+---
+
+## 🔹 Verification
+
+Go to your GitHub repository page → **refresh** → you should now see your project files uploaded!
+
+---
+
+Congratulations! You’ve successfully pushed your project to GitHub for the very first time.
