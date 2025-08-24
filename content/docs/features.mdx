@@ -1,0 +1,193 @@
+---
+title: GitHub Features
+description: Exploring GitHub Features like Issues, Discussions, Projects, Actions, and Wikis
+---
+
+---
+
+# GitHub Features
+
+GitHub is more than just a code hosting platform — it provides a set of powerful **collaboration and project management features**.  
+Understanding these features helps teams organize work, discuss ideas, and automate workflows.
+
+---
+
+## 1. Issues
+
+**GitHub Issues** are used to track tasks, bugs, feature requests, and improvements.  
+They act like a lightweight **ticketing system** for your repository.
+
+### Key Features:
+
+- Title + description (supporting Markdown).
+- Labels (categorize issues: `bug`, `enhancement`, `help wanted`).
+- Milestones (group issues by project phase/release).
+- Assignees (assign team members).
+- Cross-linking between issues and PRs.
+
+### Example workflow:
+
+1. Create an issue for a new feature:  
+   _“Add dark mode support”_.
+2. Assign a developer and add labels.
+3. Developer creates a PR that references the issue:
+
+```
+
+Fixes #12
+
+```
+
+→ When merged, the issue automatically closes.
+
+---
+
+## 2. Discussions
+
+**GitHub Discussions** provide a space for **open-ended conversations** that don’t fit in Issues or PRs.
+
+### Use cases:
+
+- Q&A (community support).
+- Brainstorming ideas.
+- Sharing announcements.
+- Best practices & documentation discussions.
+
+### Features:
+
+- Categories (Q&A, Ideas, General, Announcements).
+- Upvotes for helpful answers.
+- Mark accepted answers (in Q&A).
+
+👉 Tip: Use **Discussions** for community talks and **Issues** for actionable tasks.
+
+---
+
+## 3. Pull Requests (PRs)
+
+PRs are the main way to contribute changes.  
+They let maintainers **review, discuss, and approve** code before merging.
+
+- Supports inline code review & comments.
+- Supports **checks** (CI/CD workflows, code linting, tests).
+- Can be linked to Issues (closes automatically when merged).
+- Supports **merge strategies**: merge commit, squash, rebase.
+
+(See our detailed [Pull Requests & Forks guide](./pr_fork) for full workflow.)
+
+---
+
+## 4. Projects
+
+**GitHub Projects** is a **Kanban-style project board** to organize work.
+
+### Features:
+
+- Columns: _To Do → In Progress → Done_.
+- Link Issues & PRs directly to project cards.
+- Custom fields (priority, size, status).
+- Automations (move cards when PR is merged/issue closed).
+
+👉 Use Projects for **agile workflows**, sprints, or roadmap planning.
+
+---
+
+## 5. Actions
+
+**GitHub Actions** is GitHub’s **CI/CD platform**.  
+It automates workflows directly in your repo using YAML files in `.github/workflows/`.
+
+### Examples:
+
+- Run tests on every PR.
+- Deploy app to production when code is merged.
+- Lint & format code automatically.
+- Schedule cron jobs (daily builds, reminders).
+
+```yaml
+# .github/workflows/test.yml
+name: Run Tests
+
+on: [push, pull_request]
+
+jobs:
+test:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - run: npm install
+    - run: npm test
+```
+
+---
+
+## 6. Wiki
+
+**GitHub Wikis** allow you to write **long-form documentation** for your project.
+
+- Each page is versioned with Git.
+- Great for tutorials, architecture notes, FAQs.
+- Supports Markdown.
+- Separate from the main codebase but linked to the repo.
+
+Use the Wiki for **detailed documentation**, and keep the `README.md` for project overview.
+
+### Example: GitHub Wiki
+
+For instance, the [AI-Lab Wiki](https://github.com/MasterBhuvnesh/AI-Lab/wiki) demonstrates how teams can organize documentation, tutorials, and guides in a dedicated space linked to their repository.  
+Explore their Wiki for examples of structured project documentation.
+
+---
+
+## 7. Security & Insights
+
+GitHub provides features to keep repos secure and track contributions:
+
+- **Dependabot Alerts**: Alerts for vulnerable dependencies.
+- **Code Scanning**: Automated static analysis.
+- **Insights Tab**: Contribution graphs, community activity.
+- **Branch Protection Rules**: Require PR reviews, tests to pass before merging.
+
+---
+
+## 8. Notifications
+
+Stay updated with:
+
+- **Watching** a repo → get all activity updates.
+- **Custom notifications** → choose Issues, PRs, or Discussions only.
+- **Email / Web / Mobile push** notifications.
+
+---
+
+## 9. GitHub Pages
+
+You can host **static websites** directly from your GitHub repo.
+Popular for project documentation, portfolios, and blogs.
+
+- Source can be `main` branch or `docs/` folder.
+- Works with Jekyll, Hugo, VitePress, or custom static sites.
+- Free hosting with a `github.io` domain.
+
+> For a step-by-step guide to setting up and customizing your site, see [GitHub Pages documentation](./github_pages).
+
+---
+
+# Summary
+
+GitHub offers more than version control.
+
+- **Issues** → track tasks/bugs.
+- **Discussions** → open-ended conversations.
+- **PRs** → propose and review changes.
+- **Projects** → Kanban boards for workflow management.
+- **Actions** → CI/CD automation.
+- **Wiki** → long-form documentation.
+- **Pages** → host static websites.
+- **Security & Insights** → keep repos safe.
+
+Together, these features make GitHub a **complete collaboration platform** for developers and teams.

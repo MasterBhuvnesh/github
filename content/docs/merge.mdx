@@ -1,0 +1,274 @@
+---
+title: Merge Conflicts
+description: Understanding and Resolving Merge Conflicts in Git
+---
+
+---
+
+# Handling Merge Conflicts
+
+When working with Git in collaborative projects, you will eventually face a **merge conflict**.  
+A merge conflict happens when Git cannot automatically reconcile differences between two commits that touch the same file(s). Knowing how to handle them is an essential Git skill.
+
+---
+
+## What is a Merge Conflict?
+
+A **merge conflict** occurs when Git doesn’t know how to combine changes from different branches.  
+This usually happens when:
+
+- Two branches edited the same line in a file.
+- One branch changed a file while another branch deleted it.
+- Divergent histories exist, making automatic merging ambiguous.
+
+When this happens, Git **pauses the merge** and asks you to resolve conflicts manually.
+
+---
+
+## Example: Creating a Merge Conflict
+
+Try this demo to reproduce a merge conflict:
+
+```bash
+# start fresh
+mkdir git-conflict-demo && cd git-conflict-demo
+git init
+
+# create file with two lines
+echo "Line 1" > file.txt
+echo "Line 2" >> file.txt
+git add file.txt
+git commit -m "A: initial commit"
+
+# create a feature branch and change Line 2
+git checkout -b feature
+echo "Line 1" > file.txt
+echo "Feature edit" >> file.txt
+git add file.txt
+git commit -m "B: feature edits Line 2"
+
+# switch back to main and edit Line 2 differently
+git checkout main
+echo "Line 1" > file.txt
+echo "Main edit" >> file.txt
+git add file.txt
+git commit -m "C: main edits Line 2"
+
+# try to merge main into feature (conflict will occur)
+git checkout feature
+git merge main
+```
+
+You will see Git reporting a **conflict**.
+Check with:
+
+```bash
+git status
+```
+
+---
+
+## How to Resolve Conflicts (CLI Steps)
+
+1. Check conflicted files:
+
+   ```bash
+   git status
+   ```
+
+2. Open the conflicted file. You’ll see conflict markers like this:
+
+   ```
+   <<<<<<< HEAD
+   Feature edit
+   =======
+   Main edit
+   >>>>>>> main
+   ```
+
+3. Edit the file to keep the correct/combined content (your decision).
+
+4. Stage the resolved file:
+
+   ```bash
+   git add file.txt
+   ```
+
+5. Complete the merge:
+
+   - If merging:
+
+     ```bash
+     git commit -m "Resolve conflict in file.txt"
+     ```
+
+   - If rebasing:
+
+     ```bash
+     git rebase --continue
+     ```
+
+6. If you want to cancel:
+
+   ```bash
+   git merge --abort
+   git rebase --abort
+   ```
+
+---
+
+## Resolving Conflicts in VS Code (GUI)
+
+- Open your repo in **VS Code**.
+- Conflicted files will be highlighted in **Source Control**.
+- You’ll see options:
+
+  - **Accept Current Change** (keep your version)
+  - **Accept Incoming Change** (use the other branch’s version)
+  - **Accept Both Changes** (combine)
+  - **Compare Changes**
+
+- After resolving, save the file → `git add <file>` → `git commit` (or `git rebase --continue`).
+
+---
+
+## Useful Commands & Tips
+
+- Check conflicts:
+
+  ```bash
+  git status
+  git diff
+  ```
+
+- Open external merge tool (if configured):
+
+  ```bash
+  git mergetool
+  ```
+
+- Keep only one side:
+
+  ```bash
+  # Keep your branch
+  git checkout --ours file.txt && git add file.txt
+
+  # Keep incoming branch
+  git checkout --theirs file.txt && git add file.txt
+  ```
+
+- Abort if stuck:
+
+  ```bash
+  git merge --abort
+  git rebase --abort
+  ```
+
+---
+
+## Best Practices to Avoid Painful Conflicts
+
+- Frequently **sync your branch** with `main` (merge or rebase).
+- Keep changes **small and focused**.
+- Use **clear branch names** (`feat/login`, `fix/api-error`).
+- Communicate with teammates when editing shared files (schemas, configs, APIs).
+- Review PRs early to catch conflicts sooner.
+
+---
+
+## Hands-On Exercise (Workshop Idea)
+
+1. Instructor provides a starter repo.
+2. Each student creates a feature branch and edits the same line in a shared file.
+3. Push changes and open a PR → trigger a merge conflict.
+4. Students resolve the conflict both via **CLI** and **VS Code**.
+5. Push the resolved branch and merge successfully.
+
+---
+
+# Branching & Pull Requests
+
+## Why Branches?
+
+Branches let you isolate work on new features or fixes without affecting the main code.
+They are the foundation of collaboration in Git.
+
+---
+
+## Basic Branching Commands
+
+```bash
+# create and switch to new branch
+git checkout -b feature/awesome-button
+
+# make changes, stage, and commit
+git add .
+git commit -m "feat: add awesome button"
+
+# push branch to remote
+git push -u origin feature/awesome-button
+```
+
+---
+
+## Typical Pull Request Workflow
+
+1. Developer creates a new branch locally.
+2. Push branch to GitHub.
+3. Open a **Pull Request** (PR).
+4. Reviewers check code, suggest changes.
+5. Developer commits fixes and pushes again.
+6. After approval, PR is merged using repo’s merge policy.
+
+---
+
+## Merge Strategies
+
+- **Merge Commit** → Preserves full branch history.
+- **Squash and Merge** → Combines all commits into one. Clean history.
+- **Rebase and Merge** → Rewrites commits on top of main, no merge commit.
+
+View history with:
+
+```bash
+git log --oneline --graph
+```
+
+---
+
+## PR Best Practices
+
+- Keep PRs **small & focused**.
+- Use **meaningful branch names** (`feat/`, `fix/`, `chore/`).
+- Write a **clear PR description**: what, why, how to test.
+- Link related issues (`Fixes #123`).
+- Pull/rebase `main` before final merge to reduce conflicts.
+- Request reviewers and respond to feedback quickly.
+
+---
+
+## Example PR Workflow
+
+```bash
+# make changes locally
+git add .
+git commit -m "fix: handle null user"
+git push
+
+# open PR on GitHub
+```
+
+After review & approval:
+
+- Merge the PR according to repo policy.
+- Optionally delete the feature branch.
+
+---
+
+# Summary
+
+- **Merge conflicts** happen when Git cannot auto-merge changes.
+- Resolve them by editing files, staging, and committing.
+- Use CLI (`git status`, `git diff`, `git add`, `git commit`) or tools like VS Code.
+- Avoid conflicts by syncing often, keeping changes small, and communicating with your team.
+- Branching + PR workflow ensures controlled, reviewed, and conflict-free collaboration.

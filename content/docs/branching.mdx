@@ -1,0 +1,196 @@
+---
+title: Git Branching
+description: A compact reference for working with branches in Git.
+---
+
+# Git Branching
+
+Branches are one of the most powerful features of Git. They allow you to work on different features, fixes, or experiments in isolation, without affecting the main codebase.  
+This sheet is a handy reference you can add to your repo or share with juniors during sessions.
+
+---
+
+## Listing Branches
+
+```bash
+# show local branches
+git branch
+
+# show local branches (explicit)
+git branch --list
+
+# show local + remote branches
+git branch -a
+
+# show branches with verbose info (tracking, latest commit)
+git branch -vv
+```
+
+---
+
+## Creating Branches
+
+```bash
+# create a new local branch (without switching)
+git branch <new_branch>
+
+# create a new branch and switch into it (old style)
+git checkout -b <new_branch>
+
+# create a new branch and switch into it (modern)
+git switch -c <new_branch>
+```
+
+---
+
+## Switching Branches
+
+```bash
+# switch into an existing branch (old style)
+git checkout <branch>
+
+# switch into an existing branch (modern)
+git switch <branch>
+
+# switch to the previous branch
+git switch -
+
+# detach HEAD (useful for exploring history)
+git switch --detach <commit-ish>
+```
+
+---
+
+## Creating a Branch from a Remote Branch
+
+```bash
+# create and track a remote branch locally (modern)
+git switch -c <local_branch> origin/<remote_branch>
+
+# older approach: create local tracking branch from remote
+git checkout -b <local_branch> origin/<remote_branch>
+
+# set upstream for an existing local branch
+git branch --set-upstream-to=origin/<remote_branch> <local_branch>
+```
+
+---
+
+## Deleting Branches
+
+```bash
+# safe delete a local branch (prevents deleting unmerged changes)
+git branch -d <branch>
+
+# force delete a local branch (whether merged or not)
+git branch -D <branch>
+
+# delete a remote branch
+git push <remote> --delete <branch>
+```
+
+> Note: `git branch -d` only affects local branches.
+
+---
+
+## Renaming Branches
+
+```bash
+# rename the current branch
+git branch -m <new_name>
+
+# rename a branch while you're on a different branch
+git branch -m <old_name> <new_name>
+```
+
+---
+
+## Working With Remote Branches & Syncing
+
+```bash
+# push a local branch to the remote repo (first push)
+git push -u origin <branch>
+
+# push a local branch to a remote (subsequent pushes)
+git push origin <branch>
+
+# fetch remote refs and updates
+git fetch origin
+
+# fetch and remove stale remote-tracking branches
+git fetch --prune
+
+# pull remote changes into current branch (merge)
+git pull
+
+# pull remote changes and rebase local commits on top
+git pull --rebase
+```
+
+---
+
+## Merging Branches
+
+```bash
+# switch to main
+git checkout main
+# or
+git switch main
+
+# merge another branch into main
+git merge <other_branch>
+
+# force a merge commit even if fast-forward is possible
+git merge --no-ff <other_branch>
+```
+
+---
+
+## Comparing Branches
+
+```bash
+# compare differences between two branches
+git diff <branch_1> <branch_2>
+
+# compare a single file between two branches
+git diff <branch_1> <branch_2> -- <file>
+```
+
+---
+
+## Resolving Remote-tracking / Tracking Branch Issues
+
+```bash
+# show remote details and tracking branches
+git remote show origin
+
+# set upstream branch for current branch (alternative)
+git push -u origin <branch>
+
+# if you accidentally pushed a branch with wrong upstream, reset upstream
+git branch --unset-upstream
+git branch --set-upstream-to origin/<branch>
+```
+
+---
+
+## Working with Files: `git restore` (useful with branches)
+
+```bash
+# restore a file from another branch into your working tree
+git restore --source <branch> -- <file>
+
+# discard local changes to a file (restore from staged or HEAD)
+git restore <file>
+```
+
+---
+
+## Quick Tips
+
+- Use `git branch -a` and `git branch -vv` to discover local, remote, and tracking information.
+- Prefer `git switch` / `git switch -c` for creating and switching branches — it is clearer than `checkout`.
+- Use `git fetch --prune` periodically to remove stale remote-tracking branches.
+- Use `git pull --rebase` to keep a cleaner linear history on feature branches (team preference).
+- Use descriptive branch names like `feat/login-button` or `fix/auth-bug` to make collaboration easier.
+- When creating a branch to track a remote branch, use `git switch -c <local> origin/<remote>` or `git checkout -b <local> origin/<remote>`.
