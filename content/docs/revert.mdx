@@ -1,0 +1,235 @@
+---
+title: Revert Changes
+description: Learn how to revert changes in your codebase
+---
+
+
+# Overview
+
+git revert creates a new commit that undoes the effect of an earlier commit, without rewriting history. This is the safest way to undo changes that are already shared with others.
+
+- Safe for shared/public branches (no force-push required).
+- Leaves history intact by adding a new commit.
+- Works on one or many commits; supports merge-commit reverts.
+
+If you need to discard unpublished local commits instead, consider git reset (see Revert vs. Reset).
+
+# Quickstart
+
+- Revert the last commit:
+```bash
+git revert HEAD
+# Edit message (or use --no-edit), then save/close the editor.
+git push
+```
+
+- Revert a specific commit by SHA:
+```bash
+git revert <commit-sha>
+git push
+```
+
+- Revert but review/adjust before committing:
+```bash
+git revert --no-commit <commit-sha>
+# Inspect and edit changes
+git commit -m "Revert <commit-sha>: <reason>"
+git push
+```
+
+- Auto-use the generated commit message:
+```bash
+git revert --no-edit <commit-sha>
+```
+
+# Common Scenarios
+
+## Revert multiple commits
+
+- Sequentially list commits (they’ll be reverted in reverse chronological order by default):
+```bash
+git revert <sha3> <sha2> <sha1>
+```
+
+- Revert a recent range:
+```bash
+# Revert the last 3 commits
+git revert --no-edit HEAD~3..HEAD
+```
+
+- Revert a range but combine into a single revert commit:
+```bash
+git revert --no-commit HEAD~3..HEAD
+git commit -m "Revert last 4 commits"
+```
+
+Tip: When ranges include merges or complex history, prefer listing SHAs explicitly in the desired order, or use --no-commit and verify the resulting diff before committing.
+
+## Revert a merge commit
+
+Reverting a merge requires telling Git which parent should be considered the “mainline” (the side you want to keep).
+
+- Identify the merge commit:
+```bash
+git log --merges --oneline
+# or for one commit:
+git show --summary <merge-sha>
+```
+
+- Revert the merge, choosing a parent:
+```bash
+# -m 1 means: keep parent 1 (typically the branch you merged into)
+git revert -m 1 <merge-sha>
+```
+
+Notes:
+- Use -m 1 when the merge was into your current branch (e.g., merging a feature into main and you now want to undo that merge on main).
+- Use -m 2 (or another parent number) if you need to keep the other side.
+- You can add strategy options if needed (e.g., -X theirs/ours) but verify results carefully:
+```bash
+git revert -m 1 -X theirs <merge-sha>
+```
+
+## Resolve conflicts during revert
+
+Conflicts are handled similarly to merges/cherry-picks.
+
+```bash
+git revert <sha>   # starts a sequencer; may conflict
+# Resolve conflicts in files, then:
+git add <resolved-file> ...
+git revert --continue
+```
+
+- To abort the ongoing revert:
+```bash
+git revert --abort
+```
+
+- To stop without cleaning up sequencer state (rare):
+```bash
+git revert --quit
+```
+
+## Undo a revert (re-revert)
+
+Since revert creates a new commit, to “undo the undo” revert the revert commit:
+
+```bash
+git revert <revert-commit-sha>
+```
+
+This re-applies the original changes (subject to conflicts if the code has drifted).
+
+## Partially revert changes (specific files or hunks)
+
+git revert operates on whole commits. To revert only parts of a commit:
+
+- Restore specific paths from the parent commit (or any commit) and commit the result:
+```bash
+# Restore a file to how it looked BEFORE <sha> (i.e., in <sha>^)
+git restore --source=<sha>^ -- <pathspec>
+git commit -m "Revert <pathspec> from <sha>"
+```
+
+- Alternatively (older Git):
+```bash
+git checkout <sha>^ -- <pathspec>
+git commit -m "Revert <pathspec> from <sha>"
+```
+
+For interactive/hunk-based reverts, use your editor or git add -p to stage only the portions you want before committing.
+
+## Revert across branches
+
+You can revert any commit reachable by SHA:
+
+```bash
+# On current branch, revert a commit that originated elsewhere
+git revert <sha-from-other-branch>
+```
+
+Ensure your working branch is correct before running git revert.
+
+# Advanced Options and Flags
+
+- --no-commit / -n: Apply the revert to the index/worktree without committing.
+- --no-edit: Use the default generated message.
+- --edit / -e: Open the editor to customize the message.
+- --signoff / -s: Add Signed-off-by trailer.
+- -S: Create a signed commit (GPG/SSH signing configured).
+- -m parent-number: Revert a merge commit (choose mainline).
+- --continue / --abort / --quit: Control the ongoing revert sequence.
+- --allow-empty: Record a revert commit even if it results in an empty change.
+- -X option: Pass strategy option, e.g., -X ours or -X theirs (use with care).
+
+# Revert vs. Reset vs. Restore
+
+- Revert: Safe, public-history-friendly; creates a new commit to negate earlier changes.
+- Reset: Moves a branch pointer (rewrites history); appropriate for local/unpushed work. Avoid on shared branches unless you coordinate a force-push.
+- Restore/Checkout (files): Adjust working tree/index to match another commit for specific paths; then commit if you need history.
+
+Examples:
+
+```bash
+# Discard local uncommitted changes to a file
+git restore --worktree -- <file>
+
+# Uncommit but keep changes staged
+git reset --soft HEAD^
+
+# Hard reset local branch to remote (DANGEROUS on shared branches)
+git fetch origin
+git reset --hard origin/main
+```
+
+# Best Practices
+
+- Prefer revert on shared branches; avoid history rewrites.
+- For large/multiple reverts, start with --no-commit, inspect the diff, then commit.
+- Document “why” in the revert message (link issues, PRs, incident IDs).
+- For merge reverts, double-check -m parent selection.
+- Create a safety branch before complex reverts:
+```bash
+git switch -c backup/pre-revert-<date>
+```
+
+# Troubleshooting
+
+- Revert is empty / nothing to revert:
+  - The commit’s changes may already be undone. Use --allow-empty to still record a revert message if needed.
+- Endless conflicts:
+  - Use --no-commit to batch, resolve incrementally, then commit.
+  - Consider reverting in smaller chunks or reordering SHAs.
+- Wrong parent for merge revert:
+  - Abort (git revert --abort) and rerun with the correct -m value.
+- CI fails after revert:
+  - The revert may require adapting tests/docs; treat it like any other change and follow up with fixes.
+
+# Examples Summary
+
+- Last commit:
+```bash
+git revert HEAD
+```
+
+- Specific commit, auto-message:
+```bash
+git revert --no-edit a1b2c3d4
+```
+
+- Multiple commits in one revert commit:
+```bash
+git revert --no-commit f00 f11 f22
+git commit -m "Revert three related commits"
+```
+
+- Revert a merge (keep mainline parent 1):
+```bash
+git revert -m 1 deadbeef
+```
+
+- Re-revert (undo a previous revert):
+```bash
+git revert <revert-sha>
+```

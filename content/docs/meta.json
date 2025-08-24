@@ -7,6 +7,10 @@
     "pr_fork",
     "branching",
     "merge",
+    "revert",
+    "reset",
+    "stash",
+    "rebase",
     "features",
     "github_pages"
   ]

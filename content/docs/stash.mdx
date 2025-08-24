@@ -1,0 +1,89 @@
+---
+title: Stashing
+description: Learn how to temporarily save changes in Git using stash.
+---
+
+Imagine you're working on a new feature, but an urgent bug needs your immediate attention on another branch. Your current changes aren't ready for a commit. What do you do? This is where `git stash` comes to the rescue.
+
+Git stash takes your uncommitted changes (both staged and unstaged), saves them away for later, and then reverts your working directory back to the last commit.
+
+## Stashing Your Changes
+
+To save your changes, run the following command. It's a good practice to add a message to remember what the stash is about.
+
+```bash
+git stash save "A descriptive message about your changes"
+```
+
+If you don't provide a message, Git will create one for you. A simple `git stash` also works.
+
+```bash
+git stash
+```
+
+This command saves your changes and gives you a clean working directory.
+
+## Listing Stashes
+
+To see all your stashed changes, use:
+
+```bash
+git stash list
+```
+
+This will show a list of your stashes. The most recent one is at the top (`stash@{0}`).
+
+```
+stash@{0}: On feature-branch: A descriptive message about your changes
+stash@{1}: WIP on main: 5d82b1f Initial commit
+```
+
+## Getting Your Changes Back
+
+When you're ready to continue where you left off, you have two main options to reapply your changes.
+
+### Applying and Keeping the Stash
+
+To apply the most recent stash and keep it in your stash list, use:
+
+```bash
+git stash apply
+```
+
+To apply a specific stash from the list, use its identifier:
+
+```bash
+git stash apply stash@{1}
+```
+
+### Applying and Removing the Stash (Most Common)
+
+Usually, once you apply a stash, you don't need it anymore. The `pop` command applies the stash and then removes it from your list.
+
+```bash
+git stash pop
+```
+
+Like `apply`, you can `pop` a specific stash:
+
+```bash
+git stash pop stash@{1}
+```
+
+## Cleaning Up Stashes
+
+If you've applied a stash with `git stash apply` and want to remove it, or you simply don't need a stash anymore, you can drop it.
+
+To remove a specific stash:
+
+```bash
+git stash drop stash@{n}
+```
+
+Replace `n` with the stash number you want to remove.
+
+To remove all stashes at once (use with caution!):
+
+```bash
+git stash clear
+```

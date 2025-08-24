@@ -1,0 +1,131 @@
+---
+title: Rebasing
+description: Learn how to rebase your Git branches effectively.
+---
+
+Git rebase is one of Git's most powerful features, allowing you to rewrite commit history. Its primary purpose is to integrate changes from one branch into another by moving or combining a sequence of commits to a new base commit.
+
+This guide will walk you through how to use `git rebase`, from basic scenarios to more advanced interactive rebasing.
+
+## Why Rebase?
+
+The main reason to use `git rebase` is to maintain a clean and linear project history.
+
+- **Cleaner History**: Unlike `git merge`, which creates a merge commit every time you integrate changes, `rebase` rewrites history to appear as if you created your branch from the latest commit on the target branch. This results in a straight-line history that is often easier to read and navigate.
+- **Tidying Commits**: Before you merge a feature branch, you can use interactive rebase to clean up your commit history. This includes squashing multiple small commits into one, rewording commit messages, and reordering commits to create a logical sequence of changes.
+
+## Standard Rebase
+
+A standard rebase takes the commits from your current branch and reapplies them on top of another branch.
+
+### Scenario: Updating a Feature Branch
+
+Imagine you started a feature branch `my-feature` from `main`. While you were working, other developers pushed updates to `main`. To incorporate these updates into your branch, you can rebase `my-feature` onto `main`.
+
+1.  First, ensure your `main` branch is up-to-date:
+
+    ```bash
+    git checkout main
+    git pull origin main
+    ```
+
+2.  Switch back to your feature branch and rebase it onto `main`:
+    ```bash
+    git checkout my-feature
+    git rebase main
+    ```
+
+Git will now move the entire `my-feature` branch to begin on the tip of the `main` branch, reapplying your commits one by one.
+
+## Interactive Rebase (`-i`)
+
+Interactive rebase gives you fine-grained control over your branch's commit history. It's incredibly useful for cleaning up your work before sharing it.
+
+To start an interactive rebase, use the `-i` flag. For example, to rebase the last 3 commits on your current branch:
+
+```bash
+git rebase -i HEAD~3
+```
+
+This command opens an editor with a list of the commits you're about to rebase, along with instructions.
+
+```text
+pick 1a2b3c4 Add feature X
+pick 5d6e7f8 Fix bug in feature X
+pick 9g8h7i6 Add tests for feature X
+
+# Rebase 1234567..9g8h7i6 onto 1234567 (3 commands)
+#
+# Commands:
+# p, pick <commit> = use commit
+# r, reword <commit> = use commit, but edit the commit message
+# e, edit <commit> = use commit, but stop for amending
+# s, squash <commit> = use commit, but meld into previous commit
+# f, fixup <commit> = like "squash", but discard this commit's log message
+# x, exec <command> = run command (the rest of the line) using shell
+# b, break = stop here (continue rebase later with 'git rebase --continue')
+# d, drop <commit> = remove commit
+# l, label <label> = label current HEAD with a name
+# t, reset <label> = reset HEAD to a label
+# m, merge [-C <commit> | -c <commit>] <label> [# <oneline>]
+# .       create a merge commit using the original merge commit's
+# .       message (or the oneline, if no original merge commit was
+# .       specified). Use -c <commit> to re-create the commit's
+# .       author and time.
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+```
+
+You can change `pick` to any of the commands listed. For example, to combine all three commits into one:
+
+```text
+pick 1a2b3c4 Add feature X
+squash 5d6e7f8 Fix bug in feature X
+squash 9g8h7i6 Add tests for feature X
+```
+
+After saving and closing the editor, Git will combine the commits and prompt you to write a new commit message for the single, combined commit.
+
+## Resolving Conflicts
+
+Conflicts can occur during a rebase if one of your commits modifies the same part of a file as a commit in the target branch. When a conflict happens, the rebase process will pause.
+
+1.  Git will tell you which file has a conflict. Open the file and resolve the conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`).
+2.  After resolving the conflict, stage the modified file:
+    ```bash
+    git add <conflicted-file>
+    ```
+3.  Continue the rebase:
+    ```bash
+    git rebase --continue
+    ```
+
+If you get stuck or want to cancel the rebase, you can always abort:
+
+```bash
+git rebase --abort
+```
+
+## The Golden Rule of Rebasing
+
+**Never rebase a public branch that other developers have based their work on.**
+
+Rebasing rewrites commit history. If you rebase a branch like `main` or a shared feature branch, you are creating new commits. When other developers pull the rebased branch, Git will see their local history as having diverged from the remote, leading to confusion and complicated merges.
+
+Only rebase branches that are local to your machine and that you haven't shared with others.
+
+## Pulling with Rebase
+
+When you use `git pull`, it defaults to fetching and then merging (`git fetch` + `git merge`). This can clutter your history with merge commits. To maintain a linear history, you can configure `pull` to use rebase instead:
+
+```bash
+git pull --rebase
+```
+
+This command fetches the remote changes and then rebases your local commits on top of the updated remote branch.
+
+You can make this the default behavior for all branches:
+
+```bash
+git config --global pull.rebase true
+```
